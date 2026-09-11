@@ -1,17 +1,21 @@
 package com.airquality.backend.service;
-import com.airquality.backend.entity.AirQualityReading;
+
+import com.airquality.backend.dto.AirQualityReadingRequest;
+import com.airquality.backend.dto.AirQualityReadingResponse;
 
 import java.util.List;
 
 public interface AirQualityService {
-    AirQualityReading createReading(
+    AirQualityReadingResponse createReading(
             Long locationId,
-            AirQualityReading reading);
+            AirQualityReadingRequest request
+    );
 
-    List<AirQualityReading>
-    getReadingsByLocation(Long locationId);
+    List<AirQualityReadingResponse> getReadingsByLocation(
+            Long locationId
+    );
 
-    AirQualityReading getReadingById(Long id);
+    AirQualityReadingResponse getReadingById(Long id);
 
     void deleteReading(Long id);
 }

@@ -1,9 +1,12 @@
 package com.airquality.backend.controller;
 
-import com.airquality.backend.entity.AirQualityReading;
+import com.airquality.backend.dto.AirQualityReadingRequest;
+import com.airquality.backend.dto.AirQualityReadingResponse;
 import com.airquality.backend.service.AirQualityService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,36 +21,45 @@ public class AirQualityController {
     private final AirQualityService airQualityService;
 
     @PostMapping("/location/{locationId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AirQualityReading createReading(
+    public ResponseEntity<AirQualityReadingResponse> createReading(
             @PathVariable Long locationId,
-            @RequestBody AirQualityReading reading) {
+            @Valid @RequestBody AirQualityReadingRequest request) {
 
-        return airQualityService
-                .createReading(locationId, reading);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        airQualityService.createReading(
+                                locationId,
+                                request
+                        )
+                );
     }
 
     @GetMapping("/location/{locationId}")
-    public List<AirQualityReading> getReadings(
+    public ResponseEntity<List<AirQualityReadingResponse>>
+    getReadingsByLocation(
             @PathVariable Long locationId) {
 
-        return airQualityService
-                .getReadingsByLocation(locationId);
+        return ResponseEntity.ok(
+                airQualityService.getReadingsByLocation(locationId)
+        );
     }
 
     @GetMapping("/{id}")
-    public AirQualityReading getReading(
+    public ResponseEntity<AirQualityReadingResponse> getReadingById(
             @PathVariable Long id) {
 
-        return airQualityService
-                .getReadingById(id);
+        return ResponseEntity.ok(
+                airQualityService.getReadingById(id)
+        );
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReading(
+    public ResponseEntity<Void> deleteReading(
             @PathVariable Long id) {
 
         airQualityService.deleteReading(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

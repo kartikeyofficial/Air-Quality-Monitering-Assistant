@@ -1,9 +1,12 @@
 package com.airquality.backend.controller;
 
-import com.airquality.backend.entity.Location;
+import com.airquality.backend.dto.LocationRequest;
+import com.airquality.backend.dto.LocationResponse;
 import com.airquality.backend.service.LocationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,39 +20,47 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Location createLocation(
-            @RequestBody Location location) {
+    public ResponseEntity<LocationResponse> createLocation(
+            @Valid @RequestBody LocationRequest request) {
 
-        return locationService.createLocation(location);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(locationService.createLocation(request));
     }
 
     @GetMapping
-    public List<Location> getAllLocations() {
+    public ResponseEntity<List<LocationResponse>> getAllLocations() {
 
-        return locationService.getAllLocations();
+        return ResponseEntity.ok(
+                locationService.getAllLocations()
+        );
     }
 
     @GetMapping("/{id}")
-    public Location getLocationById(
+    public ResponseEntity<LocationResponse> getLocationById(
             @PathVariable Long id) {
 
-        return locationService.getLocationById(id);
+        return ResponseEntity.ok(
+                locationService.getLocationById(id)
+        );
     }
 
     @PutMapping("/{id}")
-    public Location updateLocation(
+    public ResponseEntity<LocationResponse> updateLocation(
             @PathVariable Long id,
-            @RequestBody Location location) {
+            @Valid @RequestBody LocationRequest request) {
 
-        return locationService.updateLocation(id, location);
+        return ResponseEntity.ok(
+                locationService.updateLocation(id, request)
+        );
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLocation(
+    public ResponseEntity<Void> deleteLocation(
             @PathVariable Long id) {
 
         locationService.deleteLocation(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

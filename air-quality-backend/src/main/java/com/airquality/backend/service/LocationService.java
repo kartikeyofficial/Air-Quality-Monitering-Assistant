@@ -1,17 +1,19 @@
 package com.airquality.backend.service;
 
-import com.airquality.backend.entity.Location;
+
+import com.airquality.backend.dto.LocationRequest;
+import com.airquality.backend.dto.LocationResponse;
 
 import java.util.List;
 
 public interface LocationService {
-    Location createLocation(Location location);
+    LocationResponse createLocation(LocationRequest request);
 
-    List<Location> getAllLocations();
+    List<LocationResponse> getAllLocations();
 
-    Location getLocationById(Long id);
+    LocationResponse getLocationById(Long id);
 
-    Location updateLocation(Long id, Location location);
+    LocationResponse updateLocation(Long id, LocationRequest request);
 
     void deleteLocation(Long id);
 }
