@@ -8,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -36,12 +40,23 @@ public class AirQualityController {
     }
 
     @GetMapping("/location/{locationId}")
-    public ResponseEntity<List<AirQualityReadingResponse>>
+    public ResponseEntity<Page<AirQualityReadingResponse>>
     getReadingsByLocation(
-            @PathVariable Long locationId) {
+            @PathVariable Long locationId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("recordedAt").descending()
+        );
 
         return ResponseEntity.ok(
-                airQualityService.getReadingsByLocation(locationId)
+                airQualityService.getReadingsByLocation(
+                        locationId,
+                        pageable
+                )
         );
     }
 

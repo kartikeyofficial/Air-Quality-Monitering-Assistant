@@ -20,9 +20,10 @@ public class AirQualityReading {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
-
+    @Column(name = "pm25")
     private Double pm25;
 
+    @Column(name = "pm10")
     private Double pm10;
 
     private Double co;
@@ -37,13 +38,16 @@ public class AirQualityReading {
 
     private Double humidity;
 
+    @Column(name = "wind_speed")
     private Double windSpeed;
 
     private Double pressure;
 
     private Double aqi;
 
+    @Column(name = "aqi_category")
     private String aqiCategory;
 
+    @Column(name = "recorded_at")
     private LocalDateTime recordedAt;
 }

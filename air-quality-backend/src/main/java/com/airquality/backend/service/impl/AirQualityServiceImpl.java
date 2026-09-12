@@ -9,6 +9,8 @@ import com.airquality.backend.repository.AirQualityReadingRepository;
 import com.airquality.backend.repository.LocationRepository;
 import com.airquality.backend.service.AirQualityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,22 @@ public class AirQualityServiceImpl  implements AirQualityService{
 
     private final AirQualityReadingRepository readingRepository;
     private final LocationRepository locationRepository;
+
+    @Override
+    public Page<AirQualityReadingResponse> getReadingsByLocation(
+            Long locationId,
+            Pageable pageable) {
+
+        if (!locationRepository.existsById(locationId)) {
+            throw new ResourceNotFoundException(
+                    "Location with id " + locationId + " not found"
+            );
+        }
+
+        return readingRepository
+                .findByLocationId(locationId, pageable)
+                .map(this::mapToResponse);
+    }
 
     @Override
     public AirQualityReadingResponse createReading(
