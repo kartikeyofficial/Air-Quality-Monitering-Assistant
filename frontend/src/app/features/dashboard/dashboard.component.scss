@@ -1,0 +1,78 @@
+.dashboard {
+  padding: 30px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.topbar button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.location-section {
+  margin-bottom: 30px;
+}
+
+.location-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+select {
+  padding: 10px;
+  min-width: 280px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.aqi-card {
+  padding: 30px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+}
+
+.aqi-value {
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.pollutants,
+.weather {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.card strong {
+  font-size: 25px;
+}
+
+.card span {
+  margin-left: 5px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+}

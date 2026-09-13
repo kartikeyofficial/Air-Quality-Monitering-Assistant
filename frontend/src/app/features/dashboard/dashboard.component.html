@@ -1,0 +1,156 @@
+<div class="dashboard">
+
+  <header class="topbar">
+
+    <div>
+      <h1>Air Quality DashboardComponent</h1>
+
+      <p *ngIf="user">
+        Welcome, {{ user.name }}
+      </p>
+    </div>
+
+    <button (click)="logout()">
+      Logout
+    </button>
+
+  </header>
+
+
+  <section class="location-section">
+
+    <label>Select Location</label>
+
+    <select
+      *ngIf="locations.length > 0"
+      [value]="selectedLocation?.id"
+      (change)="selectLocation(
+        locations[$any($event.target).selectedIndex]
+      )"
+    >
+
+      <option
+        *ngFor="let location of locations"
+        [value]="location.id"
+      >
+        {{ location.city }}, {{ location.state }}
+      </option>
+
+    </select>
+
+  </section>
+
+
+  <div *ngIf="loading">
+    Loading air quality data...
+  </div>
+
+
+  <div
+    *ngIf="!loading && latestReading"
+    class="dashboard-content"
+  >
+
+    <section class="aqi-card">
+
+      <h2>Current AQI</h2>
+
+      <div class="aqi-value">
+        {{ latestReading.aqi }}
+      </div>
+
+      <p>
+        {{ latestReading.aqiCategory }}
+      </p>
+
+      <small>
+        {{ latestReading.recordedAt | date:'medium' }}
+      </small>
+
+    </section>
+
+
+    <section class="pollutants">
+
+      <div class="card">
+        <h3>PM2.5</h3>
+        <strong>{{ latestReading.pm25 }}</strong>
+        <span>µg/m³</span>
+      </div>
+
+      <div class="card">
+        <h3>PM10</h3>
+        <strong>{{ latestReading.pm10 }}</strong>
+        <span>µg/m³</span>
+      </div>
+
+      <div class="card">
+        <h3>NO₂</h3>
+        <strong>{{ latestReading.no2 }}</strong>
+        <span>µg/m³</span>
+      </div>
+
+      <div class="card">
+        <h3>SO₂</h3>
+        <strong>{{ latestReading.so2 }}</strong>
+        <span>µg/m³</span>
+      </div>
+
+      <div class="card">
+        <h3>O₃</h3>
+        <strong>{{ latestReading.o3 }}</strong>
+        <span>µg/m³</span>
+      </div>
+
+      <div class="card">
+        <h3>CO</h3>
+        <strong>{{ latestReading.co }}</strong>
+        <span>mg/m³</span>
+      </div>
+
+    </section>
+
+
+    <section class="weather">
+
+      <div class="card">
+        <h3>Temperature</h3>
+        <strong>
+          {{ latestReading.temperature }} °C
+        </strong>
+      </div>
+
+      <div class="card">
+        <h3>Humidity</h3>
+        <strong>
+          {{ latestReading.humidity }} %
+        </strong>
+      </div>
+
+      <div class="card">
+        <h3>Wind Speed</h3>
+        <strong>
+          {{ latestReading.windSpeed }} m/s
+        </strong>
+      </div>
+
+      <div class="card">
+        <h3>Pressure</h3>
+        <strong>
+          {{ latestReading.pressure }} hPa
+        </strong>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <div
+    *ngIf="!loading && !latestReading"
+    class="empty-state"
+  >
+    No air-quality readings available for this location.
+  </div>
+
+</div>

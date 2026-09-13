@@ -1,0 +1,62 @@
+<div class="auth-container">
+
+  <div class="auth-card">
+
+    <h1>Air Quality Assistant</h1>
+
+    <h2>Login</h2>
+
+    <form (ngSubmit)="login()">
+
+      <div class="form-group">
+        <label>Email</label>
+
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          placeholder="Enter your email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Enter your password"
+        />
+      </div>
+
+      <p
+        class="error"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="submit"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+
+    </form>
+
+    <p>
+      Don't have an account?
+      <button
+        type="button"
+        class="link-button"
+        (click)="goToRegister()"
+      >
+        Register
+      </button>
+    </p>
+
+  </div>
+
+</div>
