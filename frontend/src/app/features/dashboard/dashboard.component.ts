@@ -25,7 +25,10 @@ export class DashboardComponent implements OnInit {
 
   latestReading: AirQualityReading | null = null;
 
-  loading = true;
+  loadingLocations = true;
+  loadingReading = false;
+
+  errorMessage = '';
 
   constructor(
     private authService: AuthService,
@@ -40,6 +43,9 @@ export class DashboardComponent implements OnInit {
   }
 
   loadLocations(): void {
+    this.loadingLocations = true;
+    this.errorMessage = '';
+
     this.locationService.getAll().subscribe({
       next: (locations) => {
         this.locations = locations;
@@ -47,13 +53,17 @@ export class DashboardComponent implements OnInit {
         if (locations.length > 0) {
           this.selectLocation(locations[0]);
         } else {
-          this.loading = false;
+          this.loadingLocations = false;
+          this.errorMessage = 'No locations are available.';
         }
       },
 
       error: (error) => {
-        console.error('Failed to load locations', error);
-        this.loading = false;
+        console.error('Failed to load locations:', error);
+
+        this.loadingLocations = false;
+
+        this.errorMessage = 'Unable to load locations.';
       },
     });
   }
@@ -61,30 +71,81 @@ export class DashboardComponent implements OnInit {
   selectLocation(location: Location): void {
     this.selectedLocation = location;
 
-    this.loading = true;
+    this.loadLatestReading(location.id);
+  }
 
-    this.airQualityService.getLatest(location.id).subscribe({
-      next: (readings) => {
-        if (readings.length > 0) {
-          this.latestReading = readings[0];
+  onLocationChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+
+    const locationId = Number(selectElement.value);
+
+    const location = this.locations.find((item) => item.id === locationId);
+
+    if (location) {
+      this.selectLocation(location);
+    }
+  }
+
+  loadLatestReading(locationId: number): void {
+    this.loadingReading = true;
+    this.latestReading = null;
+
+    this.airQualityService.getLatest(locationId).subscribe({
+      next: (response) => {
+        if (response.content && response.content.length > 0) {
+          this.latestReading = response.content[0];
         } else {
           this.latestReading = null;
         }
 
-        this.loading = false;
+        this.loadingReading = false;
+        this.loadingLocations = false;
       },
 
       error: (error) => {
-        console.error('Failed to load air quality', error);
+        console.error('Failed to load air quality:', error);
 
-        this.loading = false;
+        this.loadingReading = false;
+        this.loadingLocations = false;
+
+        this.errorMessage = 'Unable to load air quality data.';
       },
     });
   }
 
+  getAqiClass(): string {
+    if (!this.latestReading) {
+      return '';
+    }
+
+    const aqi = this.latestReading.aqi;
+
+    if (aqi <= 50) {
+      return 'aqi-good';
+    }
+
+    if (aqi <= 100) {
+      return 'aqi-satisfactory';
+    }
+
+    if (aqi <= 200) {
+      return 'aqi-moderate';
+    }
+
+    if (aqi <= 300) {
+      return 'aqi-poor';
+    }
+
+    if (aqi <= 400) {
+      return 'aqi-very-poor';
+    }
+
+    return 'aqi-severe';
+  }
+
   logout(): void {
     this.authService.logout();
+
     window.location.href = '/login';
   }
 }
-

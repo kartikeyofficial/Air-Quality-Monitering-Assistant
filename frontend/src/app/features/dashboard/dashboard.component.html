@@ -1,156 +1,629 @@
-<div class="dashboard">
+<div class="dashboard-layout">
 
-  <header class="topbar">
+  <!-- ================= SIDEBAR ================= -->
 
-    <div>
-      <h1>Air Quality DashboardComponent</h1>
+  <aside class="sidebar">
 
-      <p *ngIf="user">
-        Welcome, {{ user.name }}
-      </p>
+    <div class="brand">
+
+      <div class="brand-icon">
+        🌿
+      </div>
+
+      <div>
+        <h2>Air Quality</h2>
+        <span>Assistant</span>
+      </div>
+
     </div>
 
-    <button (click)="logout()">
-      Logout
-    </button>
 
-  </header>
+    <nav class="navigation">
+
+      <a class="nav-item active">
+        <span>🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <a class="nav-item">
+        <span>📈</span>
+        <span>Predictions</span>
+      </a>
+
+      <a class="nav-item">
+        <span>🔔</span>
+        <span>Alerts</span>
+      </a>
+
+      <a class="nav-item">
+        <span>👤</span>
+        <span>Profile</span>
+      </a>
+
+    </nav>
 
 
-  <section class="location-section">
+    <div class="sidebar-bottom">
 
-    <label>Select Location</label>
+      <button
+        class="logout-button"
+        (click)="logout()"
+      >
+        <span>🚪</span>
+        <span>Logout</span>
+      </button>
 
-    <select
-      *ngIf="locations.length > 0"
-      [value]="selectedLocation?.id"
-      (change)="selectLocation(
-        locations[$any($event.target).selectedIndex]
-      )"
+    </div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main class="main-content">
+
+
+    <!-- HEADER -->
+
+    <header class="top-header">
+
+      <div>
+
+        <p class="welcome-text">
+          Welcome back
+        </p>
+
+        <h1>
+          {{ user?.name || 'User' }}
+        </h1>
+
+      </div>
+
+
+      <div class="profile-mini">
+
+        <div class="avatar">
+          {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+
+        <div>
+
+          <strong>
+            {{ user?.name }}
+          </strong>
+
+          <span>
+            {{ user?.email }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- LOCATION -->
+
+    <section class="location-bar">
+
+      <div>
+
+        <span class="section-label">
+          Monitoring Location
+        </span>
+
+        <h2>
+          {{ selectedLocation?.city || 'Select location' }}
+        </h2>
+
+        <p>
+          {{ selectedLocation?.state }},
+          {{ selectedLocation?.country }}
+        </p>
+
+      </div>
+
+
+      <div class="location-selector">
+
+        <label for="location">
+          Location
+        </label>
+
+        <select
+          id="location"
+          [value]="selectedLocation?.id"
+          (change)="onLocationChange($event)"
+        >
+
+          <option
+            *ngFor="let location of locations"
+            [value]="location.id"
+          >
+            {{ location.city }},
+            {{ location.state }}
+          </option>
+
+        </select>
+
+      </div>
+
+    </section>
+
+
+    <!-- ERROR -->
+
+    <div
+      class="error-message"
+      *ngIf="errorMessage"
+    >
+      {{ errorMessage }}
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+      class="loading"
+      *ngIf="loadingReading"
+    >
+      Loading air quality data...
+    </div>
+
+
+    <!-- ================= AQI OVERVIEW ================= -->
+
+    <section
+      class="content-section"
+      *ngIf="!loadingReading && latestReading"
     >
 
-      <option
-        *ngFor="let location of locations"
-        [value]="location.id"
-      >
-        {{ location.city }}, {{ location.state }}
-      </option>
+      <div class="section-heading">
 
-    </select>
+        <div>
 
-  </section>
+          <span class="section-label">
+            Air Quality Overview
+          </span>
 
+          <h2>
+            Current air quality
+          </h2>
 
-  <div *ngIf="loading">
-    Loading air quality data...
-  </div>
+        </div>
 
+        <span class="last-updated">
+          Updated:
+          {{ latestReading.recordedAt | date:'medium' }}
+        </span>
 
-  <div
-    *ngIf="!loading && latestReading"
-    class="dashboard-content"
-  >
-
-    <section class="aqi-card">
-
-      <h2>Current AQI</h2>
-
-      <div class="aqi-value">
-        {{ latestReading.aqi }}
       </div>
+
+
+      <div class="aqi-grid">
+
+
+        <!-- AQI -->
+
+        <div class="aqi-card">
+
+          <div class="card-header">
+
+            <span>
+              Air Quality Index
+            </span>
+
+            <span class="card-icon">
+              🌫️
+            </span>
+
+          </div>
+
+
+          <div class="aqi-main">
+
+            <span class="aqi-number">
+              {{ latestReading.aqi }}
+            </span>
+
+            <span
+              class="aqi-status"
+              [ngClass]="getAqiClass()"
+            >
+              {{ latestReading.aqiCategory }}
+            </span>
+
+          </div>
+
+
+          <p class="card-description">
+            Current overall air quality index
+          </p>
+
+        </div>
+
+
+        <!-- PM2.5 -->
+
+        <div class="metric-card">
+
+          <div class="metric-header">
+
+            <span>PM2.5</span>
+
+            <span>🫁</span>
+
+          </div>
+
+          <strong>
+            {{ latestReading.pm25 }}
+          </strong>
+
+          <span class="unit">
+            µg/m³
+          </span>
+
+          <p>
+            Fine particulate matter
+          </p>
+
+        </div>
+
+
+        <!-- PM10 -->
+
+        <div class="metric-card">
+
+          <div class="metric-header">
+
+            <span>PM10</span>
+
+            <span>🌫️</span>
+
+          </div>
+
+          <strong>
+            {{ latestReading.pm10 }}
+          </strong>
+
+          <span class="unit">
+            µg/m³
+          </span>
+
+          <p>
+            Coarse particulate matter
+          </p>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= POLLUTANTS ================= -->
+
+    <section
+      class="content-section"
+      *ngIf="!loadingReading && latestReading"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="section-label">
+            Pollutants
+          </span>
+
+          <h2>
+            Pollutant levels
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="metric-grid">
+
+
+        <div class="metric-card">
+
+          <div class="metric-header">
+            <span>NO₂</span>
+            <span>🏭</span>
+          </div>
+
+          <strong>
+            {{ latestReading.no2 }}
+          </strong>
+
+          <span class="unit">
+            µg/m³
+          </span>
+
+          <p>
+            Nitrogen dioxide
+          </p>
+
+        </div>
+
+
+        <div class="metric-card">
+
+          <div class="metric-header">
+            <span>SO₂</span>
+            <span>🏭</span>
+          </div>
+
+          <strong>
+            {{ latestReading.so2 }}
+          </strong>
+
+          <span class="unit">
+            µg/m³
+          </span>
+
+          <p>
+            Sulphur dioxide
+          </p>
+
+        </div>
+
+
+        <div class="metric-card">
+
+          <div class="metric-header">
+            <span>O₃</span>
+            <span>☁️</span>
+          </div>
+
+          <strong>
+            {{ latestReading.o3 }}
+          </strong>
+
+          <span class="unit">
+            µg/m³
+          </span>
+
+          <p>
+            Ozone
+          </p>
+
+        </div>
+
+
+        <div class="metric-card">
+
+          <div class="metric-header">
+            <span>CO</span>
+            <span>🚗</span>
+          </div>
+
+          <strong>
+            {{ latestReading.co }}
+          </strong>
+
+          <span class="unit">
+            mg/m³
+          </span>
+
+          <p>
+            Carbon monoxide
+          </p>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= WEATHER ================= -->
+
+    <section
+      class="content-section"
+      *ngIf="!loadingReading && latestReading"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <span class="section-label">
+            Environment
+          </span>
+
+          <h2>
+            Weather conditions
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="weather-grid">
+
+
+        <div class="weather-card">
+
+          <span class="weather-icon">
+            🌡️
+          </span>
+
+          <div>
+
+            <span>
+              Temperature
+            </span>
+
+            <strong>
+              {{ latestReading.temperature }} °C
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="weather-card">
+
+          <span class="weather-icon">
+            💧
+          </span>
+
+          <div>
+
+            <span>
+              Humidity
+            </span>
+
+            <strong>
+              {{ latestReading.humidity }} %
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="weather-card">
+
+          <span class="weather-icon">
+            💨
+          </span>
+
+          <div>
+
+            <span>
+              Wind Speed
+            </span>
+
+            <strong>
+              {{ latestReading.windSpeed }} m/s
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="weather-card">
+
+          <span class="weather-icon">
+            🌡
+          </span>
+
+          <div>
+
+            <span>
+              Pressure
+            </span>
+
+            <strong>
+              {{ latestReading.pressure }} hPa
+            </strong>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= NO DATA ================= -->
+
+    <div
+      class="no-data"
+      *ngIf="
+        !loadingReading &&
+        !latestReading &&
+        !errorMessage
+      "
+    >
+
+      <div class="no-data-icon">
+        🌫️
+      </div>
+
+      <h2>
+        No air quality data
+      </h2>
 
       <p>
-        {{ latestReading.aqiCategory }}
+        There are no readings available
+        for this location yet.
       </p>
 
-      <small>
-        {{ latestReading.recordedAt | date:'medium' }}
-      </small>
-
-    </section>
+    </div>
 
 
-    <section class="pollutants">
+    <!-- ================= COMING SOON ================= -->
 
-      <div class="card">
-        <h3>PM2.5</h3>
-        <strong>{{ latestReading.pm25 }}</strong>
-        <span>µg/m³</span>
+    <section class="upcoming-section">
+
+      <div class="upcoming-card">
+
+        <span class="upcoming-icon">
+          📈
+        </span>
+
+        <div>
+
+          <h3>
+            Historical AQI Analysis
+          </h3>
+
+          <p>
+            Track air quality trends and
+            pollutant changes over time.
+          </p>
+
+        </div>
+
+        <span class="coming-soon">
+          Phase 3C
+        </span>
+
       </div>
 
-      <div class="card">
-        <h3>PM10</h3>
-        <strong>{{ latestReading.pm10 }}</strong>
-        <span>µg/m³</span>
-      </div>
 
-      <div class="card">
-        <h3>NO₂</h3>
-        <strong>{{ latestReading.no2 }}</strong>
-        <span>µg/m³</span>
-      </div>
+      <div class="upcoming-card">
 
-      <div class="card">
-        <h3>SO₂</h3>
-        <strong>{{ latestReading.so2 }}</strong>
-        <span>µg/m³</span>
-      </div>
+        <span class="upcoming-icon">
+          🤖
+        </span>
 
-      <div class="card">
-        <h3>O₃</h3>
-        <strong>{{ latestReading.o3 }}</strong>
-        <span>µg/m³</span>
-      </div>
+        <div>
 
-      <div class="card">
-        <h3>CO</h3>
-        <strong>{{ latestReading.co }}</strong>
-        <span>mg/m³</span>
-      </div>
+          <h3>
+            AI Air Quality Prediction
+          </h3>
 
-    </section>
+          <p>
+            Machine learning based AQI
+            and PM2.5 forecasting.
+          </p>
 
+        </div>
 
-    <section class="weather">
+        <span class="coming-soon">
+          Phase 4
+        </span>
 
-      <div class="card">
-        <h3>Temperature</h3>
-        <strong>
-          {{ latestReading.temperature }} °C
-        </strong>
-      </div>
-
-      <div class="card">
-        <h3>Humidity</h3>
-        <strong>
-          {{ latestReading.humidity }} %
-        </strong>
-      </div>
-
-      <div class="card">
-        <h3>Wind Speed</h3>
-        <strong>
-          {{ latestReading.windSpeed }} m/s
-        </strong>
-      </div>
-
-      <div class="card">
-        <h3>Pressure</h3>
-        <strong>
-          {{ latestReading.pressure }} hPa
-        </strong>
       </div>
 
     </section>
 
-  </div>
 
-
-  <div
-    *ngIf="!loading && !latestReading"
-    class="empty-state"
-  >
-    No air-quality readings available for this location.
-  </div>
+  </main>
 
 </div>
